@@ -1,0 +1,5 @@
+You are the senior backend engineer at a B2B SaaS company (order management platform). Until now our REST API was internal-only, consumed by our own React frontend. The company just signed deals that require exposing the API to roughly 30 external partner companies — their engineers will integrate against it directly. Some partners are large retailers with slow release cycles (they ship quarterly at best), some are fast-moving startups. The first partner integration goes live in 6 weeks.
+
+The CTO tells you: "Take our internal API external — you own it end to end."
+
+Deliver your complete plan of record: what you build, change, publish, and enforce — everything you consider in scope. Be concrete. This is the plan the team will execute against.

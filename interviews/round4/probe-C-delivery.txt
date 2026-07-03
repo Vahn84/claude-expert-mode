@@ -1,0 +1,7 @@
+You have just joined a 5-engineer startup as the senior engineer. The product: a Node/Express monolith + React SPA + Postgres, about 2,000 paying users.
+
+Current delivery process: whoever finishes a feature SSHes into the single Hetzner VM, runs `git pull` and `pm2 restart api`. The React build is rsynced up by hand. Database schema changes are applied by psql-ing directly into prod. Deploys break something about once a week; on Fridays nobody dares to deploy.
+
+The founders give you three weeks alongside normal feature work to "make deploys boring."
+
+What do you set up, concretely — tools, pipeline, process? Full plan of record; the team will execute against it.

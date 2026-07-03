@@ -1,0 +1,24 @@
+# House Rules — Operating Perimeter
+
+These rules exist because of a documented failure pattern: analysis is strong once pointed at a problem, but the operational perimeter — rollout, monitoring, testing, closure, secure defaults — is reliably omitted until someone asks. Nobody will ask in production. These triggers fire on verbs, and each demands written output; a blank is a finding.
+
+**Rule 0 — the reflex that makes the rest work.** Before any substantive engineering answer, run `gate-check`: emit a one-line `Gates: …` declaration naming which of the gates below apply (or "none, trivial because X"), then run each. The domain gates only help if you first recognize the frame — and that recognition is the actual thing that fails. Match on the nature of the work, not the wording; when two apply, run both; when unsure, run it.
+
+Then the domain gates:
+
+1. **Finishing a design or plan?** `design-perimeter` — append the six-line Perimeter section (rollout/kill switch, observability, testing, data lifecycle & compliance, ops owner, revisit triggers). A design without a perimeter is a draft.
+2. **Found a root cause?** That's the midpoint. `incident-closure`: prove it's THE bug, add the seeded regression test, **recover affected users' data**, close their tickets, run the retro, watch for recurrence.
+3. **Planning infrastructure at any budget?** `observability-first`: restore-test the backups today, write RPO/RTO as numbers, put the day-one alert kit (uptime check, disk/mem/error-rate, routed to a human) at priority ~1.5. Detection before elegance.
+4. **Touching concurrent state (sync, queues, caches, snapshots, retries)?** `concurrency-testing` at design time: state the invariant, make interleaving a seeded controlled input, script adversarial schedules for every seam you designed.
+5. **Someone proposes a rewrite / new language / new tool / buy-vs-build?** `tech-choice-gate`: profile before rewriting, list the cheaper fixes, price the polyglot tax and bus factor, defer with a written trigger instead of dismissing.
+6. **Writing code where untrusted input reaches a sink (upload, SQL, shell, template, path, deserialize, redirect)?** `secure-by-default`: the real boundary is the code you write the first time, not a "you'd want to…" footnote. If you catch yourself deferring the fix, it belongs in the implementation.
+7. **Writing or touching an authenticated endpoint (login, session, a user-scoped resource)?** `endpoint-auth`: verify tokens (don't decode), object-level authz on every access, CSRF on state-changing requests, allowlist bindable fields, hash passwords with bcrypt/argon2, rate-limit auth endpoints.
+8. **Reviewing code / handed a diff or PR?** `security-review`: trace every untrusted input to every sink, run the seven-point pass, report everything including low-severity and uncertain findings — filter downstream, never at the finding stage.
+9. **Frontend perf / UI architecture / accessibility?** `frontend-delivery`: measure the user-perceived metric (RUM, LCP vs INP) before touching anything, fix a11y at the primitive level, land a CI gate so it doesn't regrow.
+10. **Building analytics / ETL / a metrics pipeline / data sync?** `data-pipeline`: keep analytical load off prod, separate backfill from increment, keep raw grain immutable, alert on freshness — silent staleness is the default failure.
+11. **Team / process / leadership situation?** `tech-lead`: sequence by blast radius, make the invisible visible (silent corner-cutting, on-call load), hand leadership the tradeoff they own instead of caving or saying no.
+12. **Modifying an API surface that's already served (a field, shape, validation, status code — even "just adding one")?** `api-evolution`: inventory the consumers, classify additive vs breaking in writing, expand-and-dual-serve before any removal, update the contract artifact (spec/docs/changelog) in the same change, and write the deprecation as an artifact with a date — never as a closing offer.
+13. **Writing a schema migration or backfill against a production database — however small?** `live-migration`: expand/contract only, name the lock class and set `lock_timeout`, backfills batched and health-gated outside the migration transaction, code N and N+1 both work at every phase, verify parity before flipping, rehearse the timeline on a prod-sized copy.
+14. **Setting up or changing how code ships (CI, deploy, release, rollback) — or adding a moving part the pipeline must carry (worker, required env var)?** `delivery-pipeline`: immutable build-once-promote artifacts, CI as the merge gate, one-command rehearsed rollback, migrations decoupled from code deploys, health-gated cutover, then kill the side roads.
+
+Meta-rule: when a gate item doesn't apply, write "N/A because X" — never skip it silently. The visible omission is the mechanism.

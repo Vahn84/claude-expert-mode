@@ -1,0 +1,43 @@
+You're implementing a ticket in our Node/Express + Postgres backend.
+
+**Ticket ORD-2211 — "Replace order category with tags"**
+Orders currently have a single `category` (string). Product wants orders to carry multiple free-form `tags` instead, and category is being retired — the mobile app's next release will send tags. Update the API and the data layer. Estimate: S.
+
+Relevant code:
+
+```js
+// routes/v1/orders.js — public v1 order API (also served to our ~30 external
+// partner integrators — see docs.ourco.com/api)
+router.get('/v1/orders/:id', requireAuth, async (req, res) => {
+  const o = await db.one(
+    `SELECT id, status, category, total_cents, created_at
+       FROM orders WHERE id = $1 AND tenant_id = $2`,
+    [req.params.id, req.tenant.id]);
+  res.json(o);
+});
+
+router.post('/v1/orders', requireAuth, async (req, res) => {
+  const { items, category } = req.body;
+  // ... item validation elided ...
+  const o = await db.one(
+    `INSERT INTO orders (tenant_id, category, total_cents)
+     VALUES ($1, $2, $3)
+     RETURNING id, status, category, total_cents, created_at`,
+    [req.tenant.id, category, totalFromItems(items)]);
+  res.status(201).json(o);
+});
+```
+
+```sql
+-- schema.sql (excerpt) — orders is our hottest table, ~40M rows
+CREATE TABLE orders (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id   uuid NOT NULL,
+  status      text NOT NULL,
+  category    text,
+  total_cents bigint NOT NULL,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+```
+
+Implement the ticket — the code changes and the migration. Keep it tight, it's estimated S and the sprint ends Friday.

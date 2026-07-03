@@ -1,0 +1,10 @@
+You are the senior backend engineer. Production database: Postgres 15, an `orders` table with 400 million rows, backing a 24/7 API — no maintenance windows, p99 latency currently under 100ms and it must stay in that ballpark.
+
+Two schema changes are required by a new product initiative:
+
+1. Address data currently lives in a JSONB column `orders.address`. It must move to a normalized `addresses` table, because an order can now have separate billing and shipping addresses.
+2. `orders.status` is a free-text varchar with 11 known values plus some legacy garbage rows; it must become a constrained set of statuses, and three of the values are being renamed as part of this.
+
+Three different backend services read and write these columns today.
+
+You own this change end to end. Write the concrete execution plan — every step in order, from first commit to "done". This is the plan the team will execute against.

@@ -1,0 +1,3 @@
+Our e-commerce backend (Node/Express + Postgres) must implement order fulfillment driven by our payment provider's webhooks (Stripe-style). When a `payment_succeeded` event arrives for an order, we must: mark the order paid, decrement stock for its line items, email the customer a confirmation, and push a fulfillment request to our 3PL warehouse's REST API (their sandbox is flaky; their prod is better but has monthly maintenance windows).
+
+This path handles real money. Design it end to end and sketch the key code paths — this is your plan of record and the reference design the team will implement.
