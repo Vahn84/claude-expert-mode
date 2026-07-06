@@ -50,7 +50,8 @@ git clone https://github.com/Vahn84/claude-expert-mode.git /path/to/claude-exper
 
 # 2. Link the installer into your global Claude Code skills
 cd /path/to/claude-expert-mode
-ln -sfn "$(pwd)/.claude/skills/setup-claude-expert-mode" ~/.claude/skills/setup-claude-expert-mode
+# (if you use a custom CLAUDE_CONFIG_DIR, it is honored automatically)
+ln -sfn "$(pwd)/.claude/skills/setup-claude-expert-mode" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/setup-claude-expert-mode"
 ```
 
 Then open Claude Code in any repo and run:
