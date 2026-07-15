@@ -37,6 +37,9 @@ Three rules govern it:
 | modify a served API surface (field/shape/validation/status/auth on an existing endpoint) | `api-evolution` |
 | write a schema migration or backfill against a production database | `live-migration` |
 | set up / change CI, deploys, release, rollback — or add a moving part the pipeline must carry | `delivery-pipeline` |
+| start a new project / feature / implementation / component from scratch | `grill-with-docs`* — interview the requester before designing (glossary + ADRs as you go); plain `grilling` only for a bounded change introducing no new terms or architecture decisions — say which and why. N/A only if a plan artifact for this work already exists. |
+
+\* External skill — not shipped in this pack. If neither `grill-with-docs` nor `grilling` is installed, don't skip silently: say the gate fired and the skill is missing, then interview before designing anyway.
 
 The map is a lookup you scan, not a checklist you run — the executable part is the three rules above. Genuinely trivial work (a one-line fix, a factual question) gets `Gates: none, trivial because …` and nothing more. Writing "none" is itself the safeguard: it forces the check that would otherwise be skipped silently.
 

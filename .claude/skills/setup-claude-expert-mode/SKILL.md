@@ -51,7 +51,7 @@ This is a prompt-driven skill, not a deterministic script. Explore, present, let
 - Resolve the **pack root**: this skill's directory's parent is the skills dir; two levels up is the pack root (with `CLAUDE.md` and `HANDOVER.md`). If run from a copy that lost its siblings, stop and ask for the pack path.
 - Look at the **target**: is this a project repo (has `.git`, or the user is working in one) or does the user want a global install? The global root is `$CLAUDE_CONFIG_DIR` when that env var is set, `~/.claude` otherwise — resolve it, don't assume; multi-account setups run several config dirs. If the global `skills/` dir is a symlink (shared-folder setups), install through it — never replace the symlink with a real directory.
 - Check for a previous install: `expert-mode-manifest.md` next to the target's skills dir. If present, this run is an **update/sync**, not a fresh install — read it and diff against the new selection in step 3.
-- Check the target's `CLAUDE.md` / `AGENTS.md` for an existing `## House Rules — Operating Perimeter` (or `## Claude Expert Mode`) block. Follow `@path` import lines while looking: the block may live in an imported file (e.g. a shared `house-rules.md`) — the imported file is then the edit target in step 4, not the importing `CLAUDE.md`.
+- Check the target's `CLAUDE.md` / `AGENTS.md` for an existing `## House Rules — Operating Perimeter` (or `## Claude Expert Mode`) block. Follow `@path` import lines while looking: the block may live in an imported file (conventionally `gate-checks.md`; older installs used `house-rules.md`) — the imported file is then the edit target in step 4, not the importing `CLAUDE.md`.
 - Check the target's skills dir for name collisions with skills that did NOT come from this pack (not listed in a manifest) — never silently overwrite those; surface them.
 
 ### 2. Ask scope and toggles
@@ -60,7 +60,7 @@ Walk through **one decision at a time**; assume the user hasn't read the handove
 
 **Section A — Where to install.**
 
-> Explainer: project install (`<repo>/.claude/skills/`) gates only that repo and travels with it in git; global install (`<config-dir>/skills/`, where the config dir is `$CLAUDE_CONFIG_DIR` or `~/.claude`) gates every session on this machine. The House Rules block goes into the matching CLAUDE.md (project, or the config dir's `CLAUDE.md` — or the imported file that already holds the block, per step 1).
+> Explainer: project install (`<repo>/.claude/skills/`) gates only that repo and travels with it in git; global install (`<config-dir>/skills/`, where the config dir is `$CLAUDE_CONFIG_DIR` or `~/.claude`) gates every session on this machine. The House Rules block lands in a `gate-checks.md` imported from the matching CLAUDE.md (project, or the config dir's — or whatever imported file already holds the block, per step 1 and step 4.2).
 
 **Section B — What to install.** Present the six groups with their one-liners. Offer three modes:
 
@@ -77,7 +77,12 @@ Walk through **one decision at a time**; assume the user hasn't read the handove
 ### 4. Write
 
 1. **Copy skill directories** from the pack to the target skills dir. Copy, don't symlink — the target may be committed to git or leave this machine. Never copy `setup-claude-expert-mode` itself into a project (it stays in the pack / global skills).
-2. **House Rules block.** Edit the file located in step 1: the imported file when the existing block lives behind an `@` import, else `CLAUDE.md` if it exists, else `AGENTS.md`, else ask which to create — never create one when the other exists, and never write the block into a `CLAUDE.md` whose block actually lives in an import (that duplicates it). Build the block from the pack-root `CLAUDE.md`:
+2. **House Rules block.** Where it goes, in order of preference:
+   - **Existing block behind an `@` import** (step 1): that imported file is the edit target — never also write into the importing `CLAUDE.md` (that duplicates it).
+   - **Existing inline block**: replace it in place (or offer to extract it to `gate-checks.md` + an `@` import — recommended, see next).
+   - **Fresh install (no block anywhere)**: create **`gate-checks.md`** next to the target `CLAUDE.md`/`AGENTS.md`, write the block there, and append a single import line (`@gate-checks.md`, or the relative path) to `CLAUDE.md` if it exists, else `AGENTS.md`, else ask which to create. The curated file stays hand-edited; the machine-replaceable block lives in its own file. Write the block inline only as a fallback when the target can't follow imports.
+
+   Build the block from the pack-root `CLAUDE.md`:
    - Take the intro paragraph, Rule 0 (only if `gate-check` is installed), the numbered rules whose skills are installed (renumber sequentially so there are no holes), and the meta-rule.
    - If a previous Expert Mode block exists, replace it in place; don't duplicate; don't touch surrounding user content.
 3. **Trim `gate-check`'s map** in the *installed copy* (never in the pack): delete map rows pointing at skills that aren't installed. If a full-set install, no trim. Leave the three rules and everything else untouched.
