@@ -1,6 +1,6 @@
 ---
 name: setup-claude-expert-mode
-description: Install and configure Claude Expert Mode (the verb-triggered perimeter-gate skillset from the Fable→Opus handover) in a target project or globally. Lets the user toggle which skill groups / individual skills to install, wires the matching House Rules into the target's CLAUDE.md, trims the gate-check router map to the installed set, and records a manifest so re-running updates or prunes a previous install.
+description: Install and configure Claude Expert Mode (the verb-triggered perimeter-gate skillset) in a target project or globally. Toggle which skills to install, wires matching House Rules into CLAUDE.md, trims the gate-check router map, records a manifest so re-running updates or prunes a previous install.
 disable-model-invocation: true
 ---
 
